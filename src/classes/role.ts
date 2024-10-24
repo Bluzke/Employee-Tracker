@@ -8,18 +8,18 @@ class Role {
 // Declare properties of the role class
  name: string;
  salary: number;
- departments: Department[]
+ department: Department[]
 
   // Create a constructor that accepts the properties of the role class
   constructor (
   name: string,
   salary: number,
-  departments : Department[],
+  department: Department[],
   ) {
     // The constructor should initialize the properties of the role class
  this.name = name;
  this.salary = salary;
- this.departments= departments;
+ this.department= department;
 
 }
 }

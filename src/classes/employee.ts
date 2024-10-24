@@ -1,22 +1,22 @@
-// Importing Vehicle and Wheel classes
+// Importing role js
 import { visitNode } from 'typescript';
 import Role from './role.js';
 
 
 // The role class
-class Vehicle {
+class Employee {
 // Declare properties of the Vehicle class
  firstName: string;
  lastName: string;
  role: Role[];
- manager: Manager[];
+ manager: Employee[];
 
   // Create a constructor that accepts the properties of the Vehicle class
   constructor (
-  name: string,
-  salary: number,
+  firstName: string,
+  lastName: string,
   role : Role[],
-  manager: Manager[],
+  manager: Employee[],
   ) {
     // The constructor should initialize the properties of the Vehicle class
  this.firstName = firstName;
@@ -28,4 +28,4 @@ class Vehicle {
 }
 
 // Export the Vehicle class as the default export
-export default Vehicle;
+export default Employee;
