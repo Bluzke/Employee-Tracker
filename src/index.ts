@@ -1,7 +1,7 @@
 // import classes
-import Truck from "./classes/Truck.js";
+import Truck from "./classes/employee.js";
 import Car from "./classes/Car.js";
-import Motorbike from "./classes/Motorbike.js";
+import Motorbike from "./classes/role.js";
 import Wheel from "./classes/Wheel.js";
 import Cli from "./classes/Cli.js";
 
