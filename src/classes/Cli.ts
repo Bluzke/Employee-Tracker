@@ -1,6 +1,7 @@
 // importing classes from other files
 import inquirer from "inquirer";
-// import { QueryResult } from 'pg';
+import { QueryResult } from 'pg';
+import {pool} from './connection.js';
 import Department from "./department.js";
 import Role from './role.js';
 import Employee from './employee.js';
@@ -11,20 +12,18 @@ class Cli {
   // TODO: update the vehicles property to accept Truck and Motorbike objects as well
   // TODO: You will need to use the Union operator to define additional types for the array
   // TODO: See the AbleToTow interface for an example of how to use the Union operator
-  // vehicles: (Car | Truck | Motorbike)[];
-  // selectedVehicleVin: string | undefined;
   // exit: boolean = false;
 
   // // TODO: Update the constructor to accept Truck and Motorbike objects as well
-  // constructor(vehicles: (Car | Truck | Motorbike)[]) {
-  //   this.vehicles = vehicles;
+  constructor() {
+  }
   // }
 
   // make a menu the 6 options 
 
 
   // add department function
-  
+    
   // add role function
 
   // add employee function
@@ -44,6 +43,7 @@ class Cli {
         const department = new Department(
           answers.name,
         );
+        this.query(dep)(department)
   });
     }
     
@@ -76,6 +76,7 @@ class Cli {
           parseInt(answers.salary),
           answers.department,
         );
+       
       });
   }
 
@@ -111,37 +112,58 @@ class Cli {
           answers.role,
           answers.manager,
         );
+        
       });
   }
 
-  // method to find a vehicle to tow
-  // TODO: add a parameter to accept a truck object
-  // findVehicleToTow(tow: Truck): void {
-  //   inquirer
-  //     .prompt([
-  //       {
-  //         type: 'list',
-  //         name: 'vehicleToTow',
-  //         message: 'Select a vehicle to tow',
-  //         choices: this.vehicles.map((vehicle) => {
-  //           return {
-  //             name: `${vehicle.vin} -- ${vehicle.make} ${vehicle.model}`,
-  //             value: vehicle,
-  //           };
-  //         }),
-  //       },
-  //     ])
-  //     .then((answers) => {
-  //       // TODO: check if the selected vehicle is the truck
-  //       if (answers.vehicle.vin === tow.vin) {
-  //         console.log( 'The truck cannot tow itself')
-  //       } else { 
-  //         tow.tow(answers.vehicle)
-  //       }
-        // TODO: if it is, log that the truck cannot tow itself then perform actions on the truck to allow the user to select another action
-        // TODO: if it is not, tow the selected vehicle then perform actions on the truck to allow the user to select another action
-  //     });
-  // }
+  viewDepartment(): void {
+    inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'selectedDepartment',
+        message: 'View All Departments',
+        choices: this.employees.map((employee) => {
+          return {
+            
+          }
+        })
+      }
+    ])
+  }
+
+  viewRole(): void {
+    inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'selectedRole',
+        message: 'View All Role',
+        choices: this.employees.map((employee) => {
+          return {
+            
+          }
+        })
+      }
+    ])
+  }
+
+  viewEmployee(): void {
+    // pool.qeury employees
+    inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'selectedEmployee',
+        message: 'View All Employees',
+        choices: this.employees.map((employee) => {
+          return {
+            
+          }
+        })
+      }
+    ])
+  }
 
   // method to start the cli
   startCli(): void {
@@ -152,17 +174,28 @@ class Cli {
           name: 'CreateOrSelect',
           message:
             'Choose an option',
-          choices: ['Create a new employee', 'Select an existing employee'],
+          choices: ['View All Employees', 'Add Employee', 'View All Roles', 'Add Role', 'View all Departments', 'Add Department'],
         },
       ])
       .then((answers) => {
         // check if the user wants to create a new vehicle or select an existing vehicle
-        if (answers.CreateOrSelect === 'Create a new employee') {
-          console.log('need to call create employee function');
-        } else {
-          console.log('need to call existing employee function');
+        if (answers.CreateOrSelect === 'View All Employees') {
+          this.viewEmployee();
+        } else if (answers.CreateOrSelect === 'Add Employee') {
+          this.createEmployee();
         }
-      });
+          else if (answers.CreateOrSelect === 'View All Roles') {
+          this.viewRole();
+        } else if (answers.CreateOrSelect === 'Add Role') {
+          this.createRole();
+        }
+        else if (answers.CreateOrSelect === 'View all Departments') {
+          this.viewDepartment();
+        } else if (answers.CreateOrSelect === 'Add Department') {
+          this.createDepartment();
+        } 
+        }
+      );
   }
 }
 
