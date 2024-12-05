@@ -1,7 +1,7 @@
 // importing classes from other files
 import inquirer from "inquirer";
 import { QueryResult } from 'pg';
-import {pool} from './connection.js';
+import {pool} from '../connection.js'
 import Department from "./department.js";
 import Role from './role.js';
 import Employee from './employee.js';
@@ -9,14 +9,7 @@ import Employee from './employee.js';
 
 // define the Cli class
 class Cli {
-  // TODO: update the vehicles property to accept Truck and Motorbike objects as well
-  // TODO: You will need to use the Union operator to define additional types for the array
-  // TODO: See the AbleToTow interface for an example of how to use the Union operator
-  // exit: boolean = false;
-
-  // // TODO: Update the constructor to accept Truck and Motorbike objects as well
-  constructor() {
-  }
+  constructor() {}
   // }
 
   // make a menu the 6 options 
@@ -39,14 +32,17 @@ class Cli {
           message: 'What is the name of the department?',
         },
       ])
-      .then((answers) => {
-        const department = new Department(
-          answers.name,
-        );
-        this.query(dep)(department)
-  });
-    }
-    
+      .then(async (answers) => {
+        try {
+          const query = "INSERT INTO department (name) VALUES ($1) RETURNING *";
+          const values = [answers.name];
+          const result = await pool.query(query, values);
+          console.log("Department added:", result.rows[0]);
+        } catch (err) {
+          console.error("Error adding department:", err);
+        }
+      });
+  }
 
   
 
@@ -70,13 +66,16 @@ class Cli {
           message: 'Which department does the role belong to?',
         },
       ])
-      .then((answers) => {
-        const role = new Role(
-          answers.name,
-          parseInt(answers.salary),
-          answers.department,
-        );
-       
+      .then(async (answers) => {
+        try {
+          const query =
+            "INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3) RETURNING *";
+          const values = [answers.title, parseFloat(answers.salary), answers.department_id];
+          const result = await pool.query(query, values);
+          console.log("Role added:", result.rows[0]);
+        } catch (err) {
+          console.error("Error adding role:", err);
+        }
       });
   }
 
@@ -105,64 +104,62 @@ class Cli {
           message: 'Who is the employees manager?',
         },
       ])
-      .then((answers) => {
-        const employee = new Employee(
-          answers.firstName,
-          answers.lastName,
-          answers.role,
-          answers.manager,
-        );
-        
+      .then(async (answers) => {
+        try {
+          const query =
+            "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4) RETURNING *";
+          const values = [
+            answers.first_name,
+            answers.last_name,
+            answers.role_id,
+            answers.manager_id || null,
+          ];
+          const result = await pool.query(query, values);
+          console.log("Employee added:", result.rows[0]);
+        } catch (err) {
+          console.error("Error adding employee:", err);
+        }
       });
   }
-
-  viewDepartment(): void {
-    inquirer
-    .prompt([
-      {
-        type: 'list',
-        name: 'selectedDepartment',
-        message: 'View All Departments',
-        choices: this.employees.map((employee) => {
-          return {
-            
-          }
-        })
-      }
-    ])
+    // Method to view all departments
+  async viewDepartment(): Promise<void> {
+    try {
+      const query = "SELECT * FROM department";
+      const result = await pool.query(query);
+      console.table(result.rows);
+    } catch (err) {
+      console.error("Error viewing departments:", err);
+    }
   }
 
-  viewRole(): void {
-    inquirer
-    .prompt([
-      {
-        type: 'list',
-        name: 'selectedRole',
-        message: 'View All Role',
-        choices: this.employees.map((employee) => {
-          return {
-            
-          }
-        })
+    // Method to view all roles
+    async viewRole(): Promise<void> {
+      try {
+        const query = `
+          SELECT role.id, role.title, role.salary, department.name AS department
+          FROM role
+          JOIN department ON role.department_id = department.id
+        `;
+        const result = await pool.query(query);
+        console.table(result.rows);
+      } catch (err) {
+        console.error("Error viewing roles:", err);
       }
-    ])
-  }
+    }
 
-  viewEmployee(): void {
-    // pool.qeury employees
-    inquirer
-    .prompt([
-      {
-        type: 'list',
-        name: 'selectedEmployee',
-        message: 'View All Employees',
-        choices: this.employees.map((employee) => {
-          return {
-            
-          }
-        })
-      }
-    ])
+  // Method to view all employees
+  async viewEmployee(): Promise<void> {
+    try {
+      const query = `
+      SELECT employee.id,employee.first_name,employee.last_name, role.title,role.salary,role.department_id
+      FROM employee
+      JOIN role ON employee.role_id = role_id; 
+      `;
+      const result = await pool.query(query);
+      console.table(result.rows);
+    } catch (err) {
+      console.error("Error viewing employees:", err);
+    }
   }
 
   // method to start the cli
