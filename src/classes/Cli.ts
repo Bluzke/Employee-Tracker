@@ -34,7 +34,7 @@ class Cli {
       ])
       .then(async (answers) => {
         try {
-          const query = "INSERT INTO department (name) VALUES ($1) RETURNING *";
+          const query = "INSERT INTO departments (name) VALUES ($1) RETURNING *";
           const values = [answers.name];
           const result = await pool.query(query, values);
           console.log("Department added:", result.rows[0]);
@@ -42,6 +42,7 @@ class Cli {
           console.error("Error adding department:", err);
         }
       });
+      
   }
 
   
@@ -77,6 +78,7 @@ class Cli {
           console.error("Error adding role:", err);
         }
       });
+    
   }
 
   // method to create an employee
@@ -124,27 +126,31 @@ class Cli {
     // Method to view all departments
   async viewDepartment(): Promise<void> {
     try {
-      const query = "SELECT * FROM department";
+      const query = "SELECT * FROM departments";
       const result = await pool.query(query);
       console.table(result.rows);
     } catch (err) {
       console.error("Error viewing departments:", err);
     }
+    // Return to main menu
+    this.startCli();
   }
 
     // Method to view all roles
     async viewRole(): Promise<void> {
       try {
         const query = `
-          SELECT role.id, role.title, role.salary, department.name AS department
-          FROM role
-          JOIN department ON role.department_id = department.id
+        SELECT role.id,role.title,role.salary, departments.department
+        FROM role
+        JOIN departments ON role.department_id = departments.id;
         `;
         const result = await pool.query(query);
         console.table(result.rows);
       } catch (err) {
         console.error("Error viewing roles:", err);
       }
+      // Return to main menu
+    this.startCli();
     }
 
   // Method to view all employees
@@ -160,6 +166,8 @@ class Cli {
     } catch (err) {
       console.error("Error viewing employees:", err);
     }
+    // Return to main menu
+    this.startCli();
   }
 
   // method to start the cli
